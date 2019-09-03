@@ -19,7 +19,9 @@ build/default/production/main.o.d build/default/production/main.o: main.c \
  /Applications/microchip/xc8/v2.05/avr/avr/include/stdlib.h \
  /Applications/microchip/xc8/v2.05/avr/lib/gcc/avr/5.4.0/include/stddef.h \
  /Applications/microchip/xc8/v2.05/avr/avr/include/avr/interrupt.h \
- USART0.h MIDI_handling.h
+ USART0.h MIDI_handling.h terminalPrint.h \
+ /Applications/microchip/xc8/v2.05/avr/avr/include/string.h RTC.h \
+ /Applications/microchip/xc8/v2.05/avr/avr/include/util/atomic.h
 
 /Applications/microchip/xc8/v2.05/avr/avr/include/avr/io.h:
 
@@ -64,3 +66,11 @@ build/default/production/main.o.d build/default/production/main.o: main.c \
 USART0.h:
 
 MIDI_handling.h:
+
+terminalPrint.h:
+
+/Applications/microchip/xc8/v2.05/avr/avr/include/string.h:
+
+RTC.h:
+
+/Applications/microchip/xc8/v2.05/avr/avr/include/util/atomic.h:

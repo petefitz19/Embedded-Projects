@@ -11,6 +11,10 @@
 #include <time.h>
 #include "MIDI_handling.h"
 #include "USART0.h"
+#include "terminalPrint.h"
+#include "RTC.h"
+
+#define TIMECNT 10
 
 enum{C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B};
 enum{NORMAL, FLIPPED, MIRRORED, RANDOM, RANDOM_88};
@@ -28,6 +32,17 @@ uint8_t dataByte2;
 
 bool shuffled = false;
 bool shuffled_88 = false;
+
+uint8_t buttonOn = 0;
+uint8_t val = 0;
+uint8_t prevVal = 1;
+
+/* Variables used for de-bouncing the buttons */
+uint8_t currentState = 0;       // bitmap for the current state of the port
+uint8_t prevState = 0;          //bitmap for the previous state of the port
+uint8_t prevButtonState2 = 0;    //the past state of the 2nd button used for increasing the mode
+uint8_t prevButtonState3 = 0;    //the past state of the 3rd button used for decreasing the mode
+uint8_t timeSame = 0;
 
 uint8_t noteMap_Normal[128] = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
@@ -135,8 +150,63 @@ void MIDI_messageReceive_ISR(){
     }
 }
 
+void MIDI_buttonDebounce_ISR(){
+    currentState = PORTF.IN & 0x7F;     //TO DO: CHECK WITH 0xC
+    
+    if(currentState == prevState){
+        timeSame++;
+    }
+    else{
+        timeSame = 0;
+    }
+    
+    if(timeSame > TIMECNT){
+        timeSame = 0;
+//        buttonState = currentState & 0x3F;
+        if(!(currentState & PIN3_bm) && (prevButtonState3)){
+            //toggles the led on and off
+            if(buttonOn){
+                PORTF.OUTCLR = PIN5_bm;
+                buttonOn = 0;
+            }
+            else{
+                PORTF.OUTSET = PIN5_bm;
+                buttonOn = 1;
+            }
+            mode++;
+            if(mode > 4){
+                mode = 0;
+            }
+        }
+        else if(!(currentState & PIN2_bm) && (prevButtonState2)){
+            //toggles the led on and off
+            if(buttonOn){
+                PORTF.OUTCLR = PIN5_bm;
+                buttonOn = 0;
+            }
+            else{
+                PORTF.OUTSET = PIN5_bm;
+                buttonOn = 1;
+            }
+            mode--;
+            if(mode == 255){
+                mode = 4;
+            }
+        }
+        TRMNL_sendNum(mode);
+        TRMNL_sendString("\r\n");
+        prevButtonState2 = currentState &  PIN2_bm;
+        prevButtonState3 = currentState &  PIN3_bm;
+    }
+    prevState = currentState;
+    
+    RTC_periodicIntISR(1);
+}
+
+
 void MIDI_transmitHandler(){
     if(flag){
+        flag = false;
         if(mode == NORMAL){
             USART0_sendByte(statusByte);
             USART0_sendByte(dataByte1);

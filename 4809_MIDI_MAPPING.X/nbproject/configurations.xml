@@ -9,8 +9,8 @@
       <itemPath>I2C_Master.h</itemPath>
       <itemPath>PicoPixel.h</itemPath>
       <itemPath>SH1106_driver.h</itemPath>
-      <itemPath>rotaryControl.h</itemPath>
       <itemPath>MIDI_handling.h</itemPath>
+      <itemPath>RTC.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -24,8 +24,8 @@
       <itemPath>terminalPrint.c</itemPath>
       <itemPath>I2C_Master.c</itemPath>
       <itemPath>SH1106_driver.c</itemPath>
-      <itemPath>rotaryControl.c</itemPath>
       <itemPath>MIDI_handling.c</itemPath>
+      <itemPath>RTC.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

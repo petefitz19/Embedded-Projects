@@ -1,7 +1,5 @@
-build/default/production/rotaryControl.o.d \
- build/default/production/rotaryControl.o: rotaryControl.c \
- rotaryControl.h \
- /Applications/microchip/xc8/v2.05/avr/avr/include/avr/io.h \
+build/default/production/RTC.o.d build/default/production/RTC.o: RTC.c \
+ RTC.h /Applications/microchip/xc8/v2.05/avr/avr/include/avr/io.h \
  /Applications/microchip/xc8/v2.05/avr/avr/include/avr/sfr_defs.h \
  /Applications/microchip/xc8/v2.05/avr/avr/include/inttypes.h \
  /Applications/microchip/xc8/v2.05/avr/lib/gcc/avr/5.4.0/include/stdint.h \
@@ -12,9 +10,11 @@ build/default/production/rotaryControl.o.d \
  /Applications/microchip/xc8/v2.05/avr/avr/include/avr/version.h \
  /Applications/microchip/xc8/v2.05/avr/avr/include/avr/xmega.h \
  /Applications/microchip/xc8/v2.05/avr/avr/include/avr/fuse.h \
- /Applications/microchip/xc8/v2.05/avr/avr/include/avr/lock.h
+ /Applications/microchip/xc8/v2.05/avr/avr/include/avr/lock.h \
+ /Applications/microchip/xc8/v2.05/avr/avr/include/util/atomic.h \
+ /Applications/microchip/xc8/v2.05/avr/avr/include/avr/interrupt.h
 
-rotaryControl.h:
+RTC.h:
 
 /Applications/microchip/xc8/v2.05/avr/avr/include/avr/io.h:
 
@@ -39,3 +39,7 @@ rotaryControl.h:
 /Applications/microchip/xc8/v2.05/avr/avr/include/avr/fuse.h:
 
 /Applications/microchip/xc8/v2.05/avr/avr/include/avr/lock.h:
+
+/Applications/microchip/xc8/v2.05/avr/avr/include/util/atomic.h:
+
+/Applications/microchip/xc8/v2.05/avr/avr/include/avr/interrupt.h:

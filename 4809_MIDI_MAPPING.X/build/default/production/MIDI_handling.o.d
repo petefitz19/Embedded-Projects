@@ -16,7 +16,11 @@ build/default/production/MIDI_handling.o.d \
  /Applications/microchip/xc8/v2.05/avr/avr/include/avr/version.h \
  /Applications/microchip/xc8/v2.05/avr/avr/include/avr/xmega.h \
  /Applications/microchip/xc8/v2.05/avr/avr/include/avr/fuse.h \
- /Applications/microchip/xc8/v2.05/avr/avr/include/avr/lock.h USART0.h
+ /Applications/microchip/xc8/v2.05/avr/avr/include/avr/lock.h USART0.h \
+ terminalPrint.h \
+ /Applications/microchip/xc8/v2.05/avr/avr/include/string.h RTC.h \
+ /Applications/microchip/xc8/v2.05/avr/avr/include/util/atomic.h \
+ /Applications/microchip/xc8/v2.05/avr/avr/include/avr/interrupt.h
 
 /Applications/microchip/xc8/v2.05/avr/lib/gcc/avr/5.4.0/include/stdbool.h:
 
@@ -53,3 +57,13 @@ MIDI_handling.h:
 /Applications/microchip/xc8/v2.05/avr/avr/include/avr/lock.h:
 
 USART0.h:
+
+terminalPrint.h:
+
+/Applications/microchip/xc8/v2.05/avr/avr/include/string.h:
+
+RTC.h:
+
+/Applications/microchip/xc8/v2.05/avr/avr/include/util/atomic.h:
+
+/Applications/microchip/xc8/v2.05/avr/avr/include/avr/interrupt.h:
