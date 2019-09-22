@@ -16,28 +16,44 @@
 #include "MIDI_handling.h"
 #include "terminalPrint.h"
 #include "RTC.h"
+#include "SH1106_driver.h"
+#include "PicoPixel.h"
 
 enum{NORMAL, FLIPPED, MIRRORED, RANDOM, RANDOM_88};
 
 int main(void){
-    TRMNL_init();
     
-    sei();
+    TWI0_init(2);                                                               //SDA is on pin PC2 and SCL is on pin PC3
     
-    USART0_init(0, 1);
+    sei();                                                                      //Enable global Interrupts
     
-    RTC_init();
-    RTC_periodicIntSet(1);
+    SH1106_init(SH1106_EXTERNALVCC);                                            //Initialize the OLED w/ external power supply
+    SH1106_setFont(&Picopixel);                                                 //Set font to Picopixel
+    SH1106_setCursor(2,15);                                                     //Cursor Starting Position
+    SH1106_setTextSize(3);                                                      //Default Font size x3
+    SH1106_display();                                                           //Display the Startup Screen
+    _delay_ms(2000);                                                            //Wait ~2 secs
+    SH1106_clearDisplay();                                                      //Clear the display
+    SH1106_display();                                                           //Display the cleared display
     
+    TRMNL_init();                                                               //Initialize Terminal (Testing Purposes))
+    
+    USART0_init(0, 1);                                                          //A4 = TX, A5 = RX, Interrupts enabled
+    
+    RTC_init();                                                                 //Initialize the Real time Clock (Debouncing)
+    RTC_periodicIntSet(1);                                                      //Set the periodic interrupt to trigger every 1 clock cycle
+    
+    /* LED MIDI INDICATOR INITIALIZATION */
     PORTF.DIRSET = PIN5_bm;
     PORTF.OUTSET = PIN5_bm;
     
+    /* BUTTON INPUT INITIALIZATION */
     PORTF.DIRCLR = PIN2_bm;
     PORTF.PIN2CTRL = PORT_PULLUPEN_bm;
-    
     PORTF.DIRCLR = PIN3_bm;
     PORTF.PIN3CTRL = PORT_PULLUPEN_bm;
     
+    MIDI_displayHandler();
     while (1) {
         MIDI_transmitHandler();
     }

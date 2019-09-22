@@ -14,10 +14,12 @@
 #include "terminalPrint.h"
 #include "RTC.h"
 
+#include "SH1106_driver.h"
+
 #define TIMECNT 10
 
 enum{C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B};
-enum{NORMAL, FLIPPED, MIRRORED, RANDOM, RANDOM_88};
+enum{NORMAL, FLIPPED, MIRRORED, RANDOM, RANDOM_88, OCTAVEUP, OCTAVEDOWN, CIRCLEOFFIFTHS};
 
 uint8_t flag = false;
 
@@ -43,6 +45,7 @@ uint8_t prevState = 0;          //bitmap for the previous state of the port
 uint8_t prevButtonState2 = 0;    //the past state of the 2nd button used for increasing the mode
 uint8_t prevButtonState3 = 0;    //the past state of the 3rd button used for decreasing the mode
 uint8_t timeSame = 0;
+bool updateNeeded = false;
 
 uint8_t noteMap_Normal[128] = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
@@ -114,6 +117,49 @@ uint8_t noteMap_Random_88[128] = {
     0, 0, 0, 0, 0, 0, 0, 0,
 };
 
+uint8_t noteMap_OctaveUp[128] = {
+    12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+    24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 
+    36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+    48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+    60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71,
+    72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83,
+    84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
+    96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107,
+    108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119,
+    120, 121, 122, 123, 124, 125, 126, 127, 0, 1, 2, 3, 
+    4, 5, 6, 7, 8, 9, 10, 11,
+};
+
+uint8_t noteMap_OctaveDown[128] = {
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+    12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+    24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 
+    36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+    48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+    60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71,
+    72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83,
+    84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
+    96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107,
+    108, 109, 110, 111, 112, 113, 114, 115,
+};
+
+
+uint8_t noteMap_circleOfFifths[128] = {
+    0, 7, 2, 9, 4, 11, 6, 13, 8, 15, 10, 17,
+    12, 19, 14, 21, 16, 23, 18, 25, 20, 27, 22, 29,
+    24, 31, 26, 33, 28, 35, 30, 37, 32, 39, 34, 41, 
+    36, 43, 38, 45, 40, 47, 42, 49, 44, 51, 46, 53,
+    48, 55, 50, 57, 52, 59, 54, 61, 56, 63, 58, 65,
+    60, 67, 62, 69, 64, 71, 66, 73, 68, 75, 70, 77,
+    72, 79, 74, 81, 76, 83, 78, 85, 80, 87, 82, 89,
+    84, 91, 86, 93, 88, 95, 90, 97, 92, 99, 94, 101,
+    96, 103, 98, 105, 100, 107, 102, 109, 104, 111, 106, 113,
+    108, 115, 110, 117, 112, 119, 114, 121, 116, 123, 118, 125,
+    120, 127, 0, 0, 0, 0, 0, 0
+};
+
 void MIDI_messageReceive_ISR(){
     incomingByte = USART0_read_ISR();
     if (state == 0) {
@@ -162,8 +208,8 @@ void MIDI_buttonDebounce_ISR(){
     
     if(timeSame > TIMECNT){
         timeSame = 0;
-//        buttonState = currentState & 0x3F;
         if(!(currentState & PIN3_bm) && (prevButtonState3)){
+            updateNeeded = true;
             //toggles the led on and off
             if(buttonOn){
                 PORTF.OUTCLR = PIN5_bm;
@@ -174,11 +220,12 @@ void MIDI_buttonDebounce_ISR(){
                 buttonOn = 1;
             }
             mode++;
-            if(mode > 4){
+            if(mode > 7){
                 mode = 0;
             }
         }
         else if(!(currentState & PIN2_bm) && (prevButtonState2)){
+            updateNeeded = true;
             //toggles the led on and off
             if(buttonOn){
                 PORTF.OUTCLR = PIN5_bm;
@@ -190,11 +237,9 @@ void MIDI_buttonDebounce_ISR(){
             }
             mode--;
             if(mode == 255){
-                mode = 4;
+                mode = 7;
             }
         }
-        TRMNL_sendNum(mode);
-        TRMNL_sendString("\r\n");
         prevButtonState2 = currentState &  PIN2_bm;
         prevButtonState3 = currentState &  PIN3_bm;
     }
@@ -251,11 +296,88 @@ void MIDI_transmitHandler(){
             USART0_sendByte(noteMap_Random_88[dataByte1]);
             USART0_sendByte(dataByte2); 
         }
+        else if(mode == OCTAVEUP){
+            USART0_sendByte(statusByte);
+            USART0_sendByte(noteMap_OctaveUp[dataByte1]);
+            USART0_sendByte(dataByte2); 
+        }
+        else if(mode == OCTAVEDOWN){
+            USART0_sendByte(statusByte);
+            USART0_sendByte(noteMap_OctaveDown[dataByte1]);
+            USART0_sendByte(dataByte2); 
+        }
+        else if(mode == CIRCLEOFFIFTHS){
+            USART0_sendByte(statusByte);
+            USART0_sendByte(noteMap_circleOfFifths[dataByte1]);
+            USART0_sendByte(dataByte2);
+        }
         else{
             USART0_sendByte(statusByte);
             USART0_sendByte(dataByte1);
             USART0_sendByte(dataByte2);
         }
+    }
+    if(updateNeeded){
+            MIDI_displayHandler();
+            updateNeeded = false;
+        }
+}
+
+void MIDI_displayHandler(){
+    //NORMAL, FLIPPED, MIRRORED, RANDOM, RANDOM_88
+    if(mode == NORMAL){
+        SH1106_clearDisplay();
+        SH1106_setCursor(2,15);
+        SH1106_writeString("Normal");
+        SH1106_display();
+    }
+    else if(mode == FLIPPED){
+        SH1106_clearDisplay();
+        SH1106_setCursor(2,15);
+        SH1106_writeString("Flipped");
+        SH1106_display();
+    }
+    else if(mode == MIRRORED){
+        SH1106_clearDisplay();
+        SH1106_setCursor(2,15);
+        SH1106_writeString("Mirrored");
+        SH1106_display();
+    }
+    else if(mode == RANDOM){
+        SH1106_clearDisplay();
+        SH1106_setCursor(2,15);
+        SH1106_writeString("Random 128");
+        SH1106_display();
+    }
+    else if(mode == RANDOM_88){
+        SH1106_clearDisplay();
+        SH1106_setCursor(2,15);
+        SH1106_writeString("Random 88");
+        SH1106_display();
+    }
+    else if(mode == OCTAVEUP){
+        SH1106_clearDisplay();
+        SH1106_setCursor(2,15);
+        SH1106_writeString("Octave Up");
+        SH1106_display();
+    }
+    else if(mode == OCTAVEDOWN){
+        SH1106_clearDisplay();
+        SH1106_setCursor(2,15);
+        SH1106_writeString("Octave Down");
+        SH1106_display();
+    }
+    else if(mode == CIRCLEOFFIFTHS){
+        SH1106_clearDisplay();
+        SH1106_setCursor(2,15);
+        SH1106_writeString("Circle of 5th");
+        SH1106_display();
+    }
+    else{
+        SH1106_clearDisplay();
+        SH1106_setCursor(2,15);
+        SH1106_writeString("Error");
+        SH1106_display();
     }
 }
 

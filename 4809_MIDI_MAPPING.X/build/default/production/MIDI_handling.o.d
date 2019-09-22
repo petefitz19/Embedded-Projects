@@ -20,7 +20,9 @@ build/default/production/MIDI_handling.o.d \
  terminalPrint.h \
  /Applications/microchip/xc8/v2.05/avr/avr/include/string.h RTC.h \
  /Applications/microchip/xc8/v2.05/avr/avr/include/util/atomic.h \
- /Applications/microchip/xc8/v2.05/avr/avr/include/avr/interrupt.h
+ /Applications/microchip/xc8/v2.05/avr/avr/include/avr/interrupt.h \
+ SH1106_driver.h I2C_Master.h \
+ /Applications/microchip/xc8/v2.05/avr/avr/include/avr/pgmspace.h
 
 /Applications/microchip/xc8/v2.05/avr/lib/gcc/avr/5.4.0/include/stdbool.h:
 
@@ -67,3 +69,9 @@ RTC.h:
 /Applications/microchip/xc8/v2.05/avr/avr/include/util/atomic.h:
 
 /Applications/microchip/xc8/v2.05/avr/avr/include/avr/interrupt.h:
+
+SH1106_driver.h:
+
+I2C_Master.h:
+
+/Applications/microchip/xc8/v2.05/avr/avr/include/avr/pgmspace.h:

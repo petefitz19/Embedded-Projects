@@ -21,7 +21,10 @@ build/default/production/main.o.d build/default/production/main.o: main.c \
  /Applications/microchip/xc8/v2.05/avr/avr/include/avr/interrupt.h \
  USART0.h MIDI_handling.h terminalPrint.h \
  /Applications/microchip/xc8/v2.05/avr/avr/include/string.h RTC.h \
- /Applications/microchip/xc8/v2.05/avr/avr/include/util/atomic.h
+ /Applications/microchip/xc8/v2.05/avr/avr/include/util/atomic.h \
+ SH1106_driver.h I2C_Master.h \
+ /Applications/microchip/xc8/v2.05/avr/avr/include/avr/pgmspace.h \
+ PicoPixel.h
 
 /Applications/microchip/xc8/v2.05/avr/avr/include/avr/io.h:
 
@@ -74,3 +77,11 @@ terminalPrint.h:
 RTC.h:
 
 /Applications/microchip/xc8/v2.05/avr/avr/include/util/atomic.h:
+
+SH1106_driver.h:
+
+I2C_Master.h:
+
+/Applications/microchip/xc8/v2.05/avr/avr/include/avr/pgmspace.h:
+
+PicoPixel.h:

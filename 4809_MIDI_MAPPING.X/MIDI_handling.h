@@ -13,6 +13,7 @@
 void MIDI_messageReceive_ISR();
 void MIDI_buttonDebounce_ISR();
 void MIDI_transmitHandler();
+void MIDI_displayHandler();
 void swap(uint8_t *a, uint8_t *b);
 void randomize(uint8_t arr[], uint8_t n);
 
